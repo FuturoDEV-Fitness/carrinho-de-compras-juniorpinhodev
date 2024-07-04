@@ -33,7 +33,29 @@ const getAllProducts = async (req, res) => { //método para listar todos os prod
     }
 };  
 
+const getProductWithDetails = async (req, res) => { //método para listar um produto com detalhes
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT p.*, c.name AS category_name
+             FROM products p
+             JOIN categories c ON p.category_id = c.id
+             WHERE p.id = $1`,
+            [id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Produto não encontrado.' });
+        }
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao listar produto com detalhes:', error);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+};
+
 module.exports = {
     createProduct,
     getAllProducts,
+    getProductWithDetails,
 };
