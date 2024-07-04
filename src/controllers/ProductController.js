@@ -2,8 +2,9 @@ const pool = require('../database/db');
 
 const createProduct = async (req, res) => {
     const { name, amount, color, voltage, description, category_id } = req.body;
-    if (!name || !category_id) {
-        return res.status(400).json({ error: 'Nome e ID da categoria são obrigatórios.' });
+
+    if (!name || !amount || !color || !voltage || !description || !category_id) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
     }
 
     try {
@@ -18,6 +19,21 @@ const createProduct = async (req, res) => {
     }
 };
 
+const getAllProducts = async (req, res) => { //método para listar todos os produtos
+    try {
+        
+        const result = await pool.query(
+            'SELECT * FROM products'
+        );
+        
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Erro ao listar produtos:', error);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+};  
+
 module.exports = {
     createProduct,
+    getAllProducts,
 };
